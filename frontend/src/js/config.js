@@ -27,23 +27,24 @@ function normalizeConfiguredUrl(rawUrl) {
 }
 
 function getWebSocketUrl() {
-    // Check if we're running in vite preview (localhost:4173 or similar)
-    const isPreviewMode = window.location.port === '4173' || 
-                         (window.location.hostname === 'localhost' && window.location.port !== '5173');
-    
-    // Vite sets this variable automatically. It's 'production' during a build, and 'development' during dev.
-    if (import.meta.env.MODE === 'production' && !isPreviewMode) {
-        // For production builds (web deploy OR Electron), use the production URL.
-        return 'wss://dropsilk-backend.onrender.com';
+    if (import.meta.env?.VITE_WEBSOCKET_URL) {
+        return import.meta.env.VITE_WEBSOCKET_URL;
     }
 
-    // For development mode or preview mode, connect to local backend
-    if (window.location.protocol !== 'https:') {
-        // Connect to the local backend using the same hostname but on port 8080.
+    if (import.meta.env?.VITE_USE_LOCAL_BACKEND === 'true') {
         return `ws://${window.location.hostname}:8080`;
     }
 
-    // A fallback for rare cases like using HTTPS in local dev.
+    const isLocalhost =
+        typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1' ||
+            window.location.hostname.endsWith('.local'));
+
+    if (isLocalhost) {
+        return `ws://${window.location.hostname}:8080`;
+    }
+
     return 'wss://dropsilk-backend.onrender.com';
 }
 
@@ -53,18 +54,12 @@ function getApiBaseUrl() {
         return normalizeConfiguredUrl(configuredBaseUrl);
     }
 
-    const isPreviewMode = window.location.port === '4173' ||
-        (window.location.hostname === 'localhost' && window.location.port !== '5173');
-
-    if (import.meta.env.MODE === 'production' && !isPreviewMode) {
-        return 'https://dropsilk-backend.onrender.com';
-    }
-
-    if (window.location.protocol !== 'https:') {
+    if (import.meta.env?.VITE_USE_LOCAL_BACKEND === 'true') {
         return `http://${window.location.hostname}:8080`;
     }
 
-    return 'https://dropsilk-backend.onrender.com';
+    // Relative path routes through Vite dev proxy locally and Vercel rewrites in production, eliminating CORS errors
+    return '';
 }
 
 export const WEBSOCKET_URL = getWebSocketUrl();

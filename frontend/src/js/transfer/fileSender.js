@@ -209,7 +209,7 @@ async function sendElectronFile(file, fileElement, sendToken) {
 export function ensureQueueIsActive() {
     const state = store.getState();
     if (
-        state.peerInfo &&
+        (state.peerInfo || state.roomPeer) &&
         !state.currentlySendingFile &&
         state.fileToSendQueue.length > 0
     ) {

@@ -31,9 +31,8 @@ import { isScreenShareActive } from './screenShareSession.js';
  * @returns {Promise<RTCIceServer[]>} A promise resolving to an array of ICE servers.
  */
 async function getIceServers() {
-    // For LAN-only connections, we don't need any external servers.
     if (store.getState().connectionType === 'lan') {
-        return [];
+        return [{ urls: 'stun:stun.l.google.com:19302' }];
     }
 
     // The backend endpoint we created to securely fetch Cloudflare credentials.
@@ -242,6 +241,8 @@ export async function initializePeerConnection(isOfferer) {
     }
 }
 
+let pendingIceCandidates = [];
+
 export async function handleSignal(data) {
     if (!peerConnection) {
         console.warn(
@@ -254,6 +255,16 @@ export async function handleSignal(data) {
             await peerConnection.setRemoteDescription(
                 new RTCSessionDescription(data.sdp)
             );
+
+            while (pendingIceCandidates.length > 0) {
+                const cand = pendingIceCandidates.shift();
+                try {
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(cand));
+                } catch (e) {
+                    console.warn('Error adding queued ICE candidate:', e);
+                }
+            }
+
             if (data.sdp.type === 'offer') {
                 const answer = await peerConnection.createAnswer();
                 await peerConnection.setLocalDescription(answer);
@@ -263,17 +274,32 @@ export async function handleSignal(data) {
                 });
             }
         } else if (data.candidate) {
-            await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            if (peerConnection?.remoteDescription?.type) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            } else {
+                pendingIceCandidates.push(data.candidate);
+            }
         }
     } catch (error) {
         console.error('Error handling signal:', error);
     }
 }
 
+let pendingDataQueue = [];
+
 function setupDataChannel() {
     dataChannel.onopen = () => {
-        console.log('Data channel opened!');
+        console.log('🎉 [DropSilk RTC] Data channel opened!');
         enableDropZone();
+
+        while (pendingDataQueue.length > 0) {
+            const queued = pendingDataQueue.shift();
+            try {
+                dataChannel.send(queued);
+            } catch (err) {
+                console.error('[DropSilk RTC] Error sending queued message:', err);
+            }
+        }
 
         const shareScreenBtn = document.getElementById('shareScreenBtn');
         if (isMobile() || !navigator.mediaDevices?.getDisplayMedia) {
@@ -308,6 +334,8 @@ function setupDataChannel() {
 }
 
 export function resetPeerConnectionState() {
+    pendingIceCandidates = [];
+    pendingDataQueue = [];
     if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
@@ -323,6 +351,9 @@ export function resetPeerConnectionState() {
 export function sendData(data) {
     if (dataChannel && dataChannel.readyState === 'open') {
         dataChannel.send(data);
+    } else {
+        console.log('[DropSilk RTC] DataChannel not open yet, buffering message. State:', dataChannel?.readyState);
+        pendingDataQueue.push(data);
     }
 }
 

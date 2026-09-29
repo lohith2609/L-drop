@@ -10,3 +10,7 @@ frontend/vite.config.js
 frontend/src/js/themeConfig.gen.js
 .idea
 .env
+.env.*
+.DS_Store
+.agents
+*.log

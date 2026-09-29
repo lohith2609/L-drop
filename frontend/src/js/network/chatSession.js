@@ -337,9 +337,17 @@ export async function sendChatMessage(text) {
         return payload;
     }
 
-    await ensureChatSession();
-    pendingMessages.push(JSON.stringify(payload));
-    flushPendingMessages();
+    // Direct transmission over the primary authenticated WebRTC DataChannel
+    sendData(JSON.stringify(payload));
+
+    try {
+        await ensureChatSession();
+        pendingMessages.push(JSON.stringify(payload));
+        flushPendingMessages();
+    } catch {
+        // Primary sendData already dispatched the message over the main channel
+    }
+
     return payload;
 }
 

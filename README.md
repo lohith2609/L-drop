@@ -1,21 +1,21 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/medy17/dropsilk/refs/heads/main/frontend/public/logo.webp" alt="DropSilk Logo" width="120" />
-  <h1>DropSilk</h1>
+  <h1>DropSilk v3.2 — WebRTC P2P Transfer &amp; Screen Streaming</h1>
   <p>
-    <b>Unlimited. Secure. Swift.</b>
+    <b>High-Throughput Peer-to-Peer Encrypted File Transfer &amp; Live Screen Streaming System</b>
     <br />
-    <i>Instantly share files and screen, device-to-device. No cloud. No limits.</i>
+    <i>Zero Cloud Storage • End-to-End DTLS/SRTP Encryption • Non-Blocking Web Workers • OPFS Safe Mode</i>
   </p>
 
   <p>
-    <a href="https://dropsilk.xyz"><strong>Production Deployment »</strong></a> <br />
-    <a href="https://dropsilk.vercel.app"><strong>Mirror »</strong></a> <br />
-    <a href="https://github.com/medy17/DropSilk_Backend"><strong>Backend Code »</strong></a>
+    <b>Candidate:</b> LOHITH. K &nbsp;|&nbsp; <b>Institution:</b> New Horizon College of Engineering, Bengaluru<br/>
+    <b>Industry Partner:</b> Zephyr Technologies &amp; Solutions Pvt. Ltd. &nbsp;|&nbsp; <b>Academic Year:</b> 2026–2027
   </p>
 
   <div>
-    <img src="https://img.shields.io/github/license/medy17/dropsilk?style=for-the-badge" alt="License"/>
-    <img src="https://img.shields.io/github/last-commit/medy17/dropsilk?style=for-the-badge" alt="Last Commit"/>
+    <img src="https://img.shields.io/badge/WebRTC-P2P%20DataChannel-blue?style=for-the-badge" alt="WebRTC"/>
+    <img src="https://img.shields.io/badge/Security-DTLS%2FSRTP%20E2EE-green?style=for-the-badge" alt="Encryption"/>
+    <img src="https://img.shields.io/badge/Deployment-Vercel%20Edge-black?style=for-the-badge" alt="Vercel"/>
   </div>
 </div>
 
@@ -424,12 +424,12 @@ When the user clicks “View Email” in the Contact modal, the app renders a re
         - Possible values currently: `reCAPTCHA token is required`, `recaptcha_failed`, `server_not_configured`, `internal_error`.
 - CORS: the backend should allow your dev/staging/production origins for `POST` with `Content-Type`.
 
-## License
+## Academic Attestation & Acknowledgements
 
-This project is licensed under the **GPLv3**. See the `LICENSE` file for more information.
+* **Candidate:** LOHITH. K
+* **Department:** Department of Computer Science and Engineering
+* **Institution:** New Horizon College of Engineering, Bengaluru (Affiliated to Visvesvaraya Technological University - VTU, Belagavi)
+* **Industry Internship Sponsor:** Zephyr Technologies & Solutions Pvt. Ltd., Bengaluru, Karnataka
+* **Academic Year:** 2026–2027
 
-## Contact & Acknowledgements
-
-Thanks to Jihah in particular for her contribution in adding coherent ms-MY support.
-
-Ahmed - [GitHub](https://github.com/medy17)
+This project is licensed under the **GPLv3**. Initial WebRTC foundations acknowledged to open-source contributors with extensive enterprise-grade enhancements, OPFS Safe Mode, and Vercel edge deployment by Lohith. K.

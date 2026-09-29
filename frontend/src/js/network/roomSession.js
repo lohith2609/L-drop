@@ -107,7 +107,7 @@ function applyRoomSummary(summary) {
     syncChatSession(summary);
 
     if (
-        summary.shouldConnect &&
+        (summary.shouldConnect || summary.peer) &&
         !store.getState().peerInfo &&
         !store.getState().signalingInitiated
     ) {

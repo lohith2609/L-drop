@@ -36,6 +36,8 @@ import { setOtpInputError } from '../ui/events.js';
 let ws;
 let pendingAttach = null;
 let suppressCloseHandling = false;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 export function connect(options = {}) {
     if (options?.roomCode && options?.participantId) {
@@ -47,6 +49,7 @@ export function connect(options = {}) {
             sendMessage({
                 type: 'attach-room',
                 roomCode: pendingAttach.roomCode,
+                flightCode: pendingAttach.roomCode,
                 participantId: pendingAttach.participantId,
             });
         }
@@ -88,6 +91,7 @@ export function disconnect({ silent = false } = {}) {
 }
 
 function onOpen() {
+    reconnectAttempts = 0;
     sendMessage({
         type: 'register-details',
         name: store.getState().myName,
@@ -99,6 +103,7 @@ function onOpen() {
         sendMessage({
             type: 'attach-room',
             roomCode: pendingAttach.roomCode,
+            flightCode: pendingAttach.roomCode,
             participantId: pendingAttach.participantId,
         });
     }
@@ -167,6 +172,8 @@ async function onMessage(event) {
 
             if (state.isFlightCreator) {
                 await initializePeerConnection(true);
+            } else {
+                await initializePeerConnection(false);
             }
         } catch (e) {
             console.error('Error in peer-joined handler:', e);
@@ -203,6 +210,20 @@ async function onClose() {
     }
 
     handleSignalingClosed();
+
+    // Auto-reconnect with backoff before showing intrusive connection lost toasts
+    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts++;
+        console.log(`WebSocket connection dropped. Retrying (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})...`);
+        const delay = Math.min(1000 * Math.pow(1.5, reconnectAttempts - 1), 4000);
+        setTimeout(() => {
+            const currentCode = store.getState().currentFlightCode;
+            const participantId = store.getState().roomParticipantId;
+            const attachOptions = currentCode && participantId ? { roomCode: currentCode, participantId } : pendingAttach;
+            connect(attachOptions);
+        }, delay);
+        return;
+    }
 
     if (!store.getState().currentFlightCode) {
         failBoarding();

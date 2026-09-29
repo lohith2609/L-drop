@@ -1,18 +1,19 @@
 {
   "name": "dropsilk",
   "version": "3.2.3",
-  "author": "Ahmed medy17 <> (ahmed@dropsilk.xyz) (https://github.com/medy17)",
-  "description": "A modern, privacy-focused, peer-to-peer file transfer application built with WebRTC",
+  "author": "LOHITH. K <lohith.k@gmail.com>",
+  "description": "High-Throughput Peer-to-Peer Encrypted File Transfer & Live Screen Streaming System with WebRTC and OPFS",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/medy17/dropsilk.git"
+    "url": "git+https://github.com/lohith2609/dropsilk.git"
   },
   "main": "electron/main.js",
   "scripts": {
     "gen:version": "node scripts/generate-version.js",
     "gen:locales": "node scripts/generate-locales.js",
-    "dev": "bun gen:version && bun gen:locales && bun update-themes && vite --host",
-    "build:web": "bun gen:version && bun gen:locales && bun update-themes && vite build",
+    "build": "node scripts/generate-version.js && node scripts/generate-locales.js && node scripts/update-themes.js && vite build",
+    "build:web": "node scripts/generate-version.js && node scripts/generate-locales.js && node scripts/update-themes.js && vite build",
+    "dev": "node scripts/generate-version.js && node scripts/generate-locales.js && node scripts/update-themes.js && vite --host",
     "dev:electron": "concurrently \"bun dev\" \"cross-env VITE_DEV_SERVER_URL=http://localhost:5173 node scripts/run-electron.js\"",
     "build:electron": "bun gen:version && bun gen:locales && bun update-themes && cross-env VITE_API_BASE_URL=https://dropsilk-backend.onrender.com vite build --base=./ && electron-builder",
     "preview": "vite preview",

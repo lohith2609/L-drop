@@ -12,6 +12,7 @@ import { isExecutable } from '../utils/security.js';
 import { isPreviewable } from '../preview/previewConfig.js';
 import { showPreview } from '../preview/previewManager.js';
 import { updateReceiverActions, checkQueueOverflow } from '../ui/view.js';
+import { appendChatMessage } from '../features/chat/chatMessages.js';
 import {
     createReceiveQueueItemHTML,
     createReceivedFileActions,
@@ -64,6 +65,15 @@ export async function handleDataChannelMessage(event) {
 
             if (parsedData.type === 'chat-requested') {
                 handleChatWakeRequest();
+                return;
+            }
+
+            if (parsedData.kind === 'chat' || parsedData.type === 'chat') {
+                appendChatMessage({
+                    author: 'peer',
+                    text: parsedData.text || '',
+                    timestamp: parsedData.sentAt || Date.now(),
+                });
                 return;
             }
 

@@ -5,6 +5,10 @@
         "destination": "/status.html"
       },
       {
+        "source": "/api/:path*",
+        "destination": "https://dropsilk-backend.onrender.com/api/:path*"
+      },
+      {
         "source": "/wp-admin/:path*",
         "destination": "https://dropsilk-server.onrender.com/wp-admin/:path*"
       },
