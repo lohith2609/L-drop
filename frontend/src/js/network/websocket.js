@@ -37,6 +37,7 @@ let ws;
 let pendingAttach = null;
 let suppressCloseHandling = false;
 let reconnectAttempts = 0;
+let heartbeatTimer = null;
 const MAX_RECONNECT_ATTEMPTS = 5;
 
 export function connect(options = {}) {
@@ -81,6 +82,11 @@ export function disconnect({ silent = false } = {}) {
     suppressCloseHandling = silent;
     pendingAttach = null;
 
+    if (heartbeatTimer) {
+        clearInterval(heartbeatTimer);
+        heartbeatTimer = null;
+    }
+
     if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
         return;
@@ -92,6 +98,16 @@ export function disconnect({ silent = false } = {}) {
 
 function onOpen() {
     reconnectAttempts = 0;
+
+    if (heartbeatTimer) {
+        clearInterval(heartbeatTimer);
+    }
+    heartbeatTimer = setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            sendMessage({ type: 'ping', timestamp: Date.now() });
+        }
+    }, 20000);
+
     sendMessage({
         type: 'register-details',
         name: store.getState().myName,
@@ -114,6 +130,9 @@ async function onMessage(event) {
     const state = store.getState();
 
     switch (msg.type) {
+    case 'pong':
+        // Keepalive pong received from signaling server
+        break;
     case 'registered':
         store.actions.setMyId(msg.id);
         break;

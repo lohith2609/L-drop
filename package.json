@@ -5,6 +5,8 @@
   "description": "High-Throughput Peer-to-Peer Encrypted File Transfer & Live Screen Streaming System",
   "author": "LOHITH. K <lohith.k@gmail.com>",
   "scripts": {
+    "start": "node server/server.js",
+    "server": "node server/server.js",
     "build": "cd frontend && npm install && npm run build",
     "dev": "cd frontend && npm run dev"
   }
